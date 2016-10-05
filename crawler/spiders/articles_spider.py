@@ -5,9 +5,9 @@ import re
 class ArticlesSpider(scrapy.Spider):
     name = "articles"
     allowed_domains = [
-        'theverge.com',
-        'wired.com',
-        'theguardian.com',
+        # 'theverge.com',
+        # 'wired.com',
+        # 'theguardian.com',
         'mashable.com'
     ]
     start_urls = [
