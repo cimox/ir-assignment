@@ -92,3 +92,4 @@ ENV/
 
 # scrapy json exports
 *.json
+*.zip

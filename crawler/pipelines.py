@@ -8,7 +8,7 @@ INDEX_TYPE = 'articles'
 class JsonWriterPipeline(object):
 
     def __init__(self):
-        self.file = open('articles-mashable.json', 'wb')
+        self.file = open('articles.json', 'wb')
 
     def process_item(self, item, spider):
         index = {
