@@ -7,10 +7,27 @@
 }
 
 em {
-    font-style: italic;
+    font-weight: 600;
 }
 
 body > div.ui-helper-hidden-accessible > div:last-child {
     text-align: center;
     visibility: hidden;
+}
+
+#search-header {
+    padding-top: 25px;
+    padding-bottom: 20px;
+}
+
+#search-results {
+    padding-top: -20px;
+}
+
+#search-thumbnail {
+    max-width: 165px;
+}
+
+span {
+    display: block;
 }

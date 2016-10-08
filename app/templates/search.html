@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Search | {{ data.query }}</title>
+    <script src="{{ url_for('static', filename='js/jquery-3.1.1.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery-ui.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/autocomplete.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" type="text/css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/normalize.css') }}" type="text/css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/skeleton.css') }}" type="text/css">
+</head>
+<body>
+<div class="container">
+    <div class="row" id="search-header">
+        <div class="two columns"><h4>Search</h4></div>
+        <div class="eight columns">
+            <input id="search" class="u-full-width" placeholder="Search" type="email">
+        </div>
+        <div class="two columns">
+            <input type="button" value="search" onclick="search()">
+        </div>
+    </div>
+    Results for query: <em>{{ data.query }}</em>
+    <hr>
+    <div class="row" id="search-results">
+        <div class="twelve columns">
+            <table class="u-full-width">
+                <tbody>
+                {% for result in data.results %}
+                <tr>
+                    <td>
+                        <img src="{{ result.fields.image_link }}" id="search-thumbnail">
+                    </td>
+                    <td>
+                        <a href="{{ result.fields.url }}"><b>{{ result.fields.title }}</b></a>
+                        <span>
+                            <b>Author: </b>
+                            <i>
+                                {% for author in result.fields.author %}
+                                    {{ author }},
+                                {% endfor %}
+                            </i>
+                        </span>
+                        <span>
+                            {{ result.short_description }}
+                        </span>
+                    </td>
+                    <td>
+                        <b>Tags:</b>
+                        {% for category in result.fields.categories %}
+                            {{ category }}
+                        {% endfor %}
+                        <span>
+                            <b>Date: </b>{{ result.fields.timestamp }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+</div>
+</body>
+</html>

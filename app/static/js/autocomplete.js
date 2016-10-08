@@ -12,7 +12,7 @@ $(function () {
                 return;
             }
 
-            $.post("autocomplete/" + request.term + '/', function (data, status, xhr) {
+            $.post("http://127.0.0.1:8080/autocomplete/" + request.term + '/', function (data, status, xhr) {
                 cache[term] = data['autocomplete'];
                 response(data['autocomplete']);
             });
@@ -26,4 +26,9 @@ $(function () {
             results: function () {}
         }
     });
+
+    search = function () {
+        query = $('#search').val();
+        window.location.href = "http://127.0.0.1:8080/search/" + query + '/';
+    }
 });
