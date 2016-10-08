@@ -1,0 +1,16 @@
+#header-row {
+    padding-top: 10%;
+    padding-bottom: 30px;
+    height: 100px;
+    font-size: 3.5em;
+    text-align: center;
+}
+
+em {
+    font-style: italic;
+}
+
+body > div.ui-helper-hidden-accessible > div:last-child {
+    text-align: center;
+    visibility: hidden;
+}
