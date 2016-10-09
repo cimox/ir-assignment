@@ -33,17 +33,33 @@ def autocomplete(query):
                       data=json.dumps(body))
     data = {
         'autocomplete': [hit['fields']['title'][0] for hit in r.json()['hits']['hits']]
-    }  # TODO: fix [0] somehow so it doesn't crash for no reason
+    }
     app.logger.debug('Autocomplete request: {} -> response: {}'.format(query, data))
     return jsonify(data)
 
 
-@app.route('/search/<string:query>/', methods=['POST', 'GET'])  # TODO: remove GET
-def search(query):
+@app.route('/search/<string:query>/', methods=['POST', 'GET'], defaults={'start': 0, 'size': 10})
+@app.route('/search/<string:query>/<int:start>/<int:size>/', methods=['POST', 'GET'])
+def search(query, start, size):
     body = {
+        "from": start, "size": size,
         "query": {
-            "match": {
-                "title": query
+            "bool": {
+                "must": {
+                    "fuzzy": {
+                        "title": query
+                    }
+                },
+                "should": [
+                    {
+                        "range": {
+                            "timestamp": {
+                                "boost": 5,
+                                "gte": "now-90d/d"
+                            }
+                        }
+                    }
+                ]
             }
         },
         "sort": [
@@ -51,7 +67,7 @@ def search(query):
             {"timestamp": {
                 "order": "desc",
                 "mode": "max"
-                }
+            }
             }
         ],
         "highlight": {
@@ -67,13 +83,17 @@ def search(query):
         results.append({
             'fields': hit['_source'],
             'highlight': hit['highlight'],
-            'short_description': u'{}...'.format(hit['_source']['article'][:180])
+            'short_description': u'{}...'.format(hit['_source'].get('article', [])[:180])
             }
         )
 
     data = {
         'query': query,
-        'results': results
+        'query_time': r.json()['took'],
+        'hits_total': r.json()['hits']['total'],
+        'results': results,
+        'start': start,
+        'size': size
     }
     return render_template('search.html', data=data)
 
@@ -83,7 +103,6 @@ def homepage(name='Matus Cimerman'):
     data = {
         'name': name,
         'cookies': request.cookies,
-        'autocomplete_js': url_for('static', filename='autocomplete.js')
     }
     return render_template('index.html', data=data)
 

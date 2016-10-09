@@ -13,15 +13,23 @@
 <body>
 <div class="container">
     <div class="row" id="search-header">
-        <div class="two columns"><h4>Search</h4></div>
+        <div class="two columns">
+            <h5>
+                <a href="http://127.0.0.1:8080/" id="search-logo">
+                    IR
+                </a>
+            </h5>
+        </div>
         <div class="eight columns">
-            <input id="search" class="u-full-width" placeholder="Search" type="email">
+            <input id="search" class="u-full-width" placeholder="Search" type="email" value="{{ data.query }}">
         </div>
         <div class="two columns">
-            <input type="button" value="search" onclick="search()">
+            <input type="button" value="search" onclick="search(0, 10)">
         </div>
     </div>
-    Results for query: <em>{{ data.query }}</em>
+    <span class="search-hits">
+        Results: {{ data.hits_total }} <i>({{ data.query_time }}ms)</i>
+    </span>
     <hr>
     <div class="row" id="search-results">
         <div class="twelve columns">
@@ -48,9 +56,11 @@
                     </td>
                     <td>
                         <b>Tags:</b>
-                        {% for category in result.fields.categories %}
-                            {{ category }}
-                        {% endfor %}
+                        <div class="tags-wrap">
+                            {% for category in result.fields.categories %}
+                                {{ category }}
+                            {% endfor %}
+                        </div>
                         <span>
                             <b>Date: </b>{{ result.fields.timestamp }}
                         </span>
@@ -59,6 +69,15 @@
                 {% endfor %}
                 </tbody>
             </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="twele columns" id="search-pagination">
+            Pagination:
+            {% if data.start >= 10 %}
+                <input type="button" value="prev" onclick="search({{ data.start - 10 }}, 10)">
+            {% endif %}
+            <input type="button" value="next" onclick="search({{ data.start + 10 }}, 10)">
         </div>
     </div>
 </div>

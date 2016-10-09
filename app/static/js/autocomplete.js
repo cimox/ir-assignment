@@ -27,8 +27,8 @@ $(function () {
         }
     });
 
-    search = function () {
+    search = function (start, end) {
         query = $('#search').val();
-        window.location.href = "http://127.0.0.1:8080/search/" + query + '/';
+        window.location.href = "http://127.0.0.1:8080/search/" + query + '/' + start + '/' + end + '/';
     }
 });
