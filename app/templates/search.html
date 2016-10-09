@@ -28,7 +28,7 @@
         </div>
     </div>
     <span class="search-hits">
-        Results: {{ data.hits_total }} <i>({{ data.query_time }}ms)</i>
+        Results: {{ data.hits_total }} <i>({{ data.query_time/1000 }}s)</i>
     </span>
     <hr>
     <div class="row" id="search-results">

@@ -2,6 +2,7 @@ import requests
 import json
 import arrow
 
+from requests import ConnectionError
 from flask import Flask, render_template, request, jsonify, url_for
 
 app = Flask(__name__)
@@ -48,8 +49,10 @@ def search(query, start, size):
         "query": {
             "bool": {
                 "must": {
-                    "match": {
-                        "title": query
+                    "multi_match": {
+                        "fields": [ "title" ],
+                        "query": query,
+                        "fuzziness": "AUTO"
                     }
                 },
                 "should": [
@@ -155,10 +158,14 @@ def search_date(interval, date_from, date_to, size):
 
 @app.route('/')
 def homepage(name='Matus Cimerman'):
+    try:
+        buckets = search_date('month', '2016', '2017', 10)['buckets']
+    except ConnectionError:
+        buckets = [{'Error': 'Elastic is down'}]
     data = {
         'name': name,
         'cookies': request.cookies,
-        'buckets': search_date('month', '2016', '2017', 10)['buckets']
+        'buckets': buckets
     }
     return render_template('index.html', data=data)
 
