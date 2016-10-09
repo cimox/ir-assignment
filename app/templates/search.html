@@ -62,7 +62,10 @@
                             {% endfor %}
                         </div>
                         <span>
-                            <b>Date: </b>{{ result.fields.timestamp }}
+                            <b>Date: </b>
+                            <a href="http://127.0.0.1:8080/date/day/{{ result.fields.timestamp }}/">
+                                {{ result.fields.timestamp }}
+                            </a>
                         </span>
                     </td>
                 </tr>

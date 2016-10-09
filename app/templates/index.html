@@ -20,7 +20,7 @@
     </div>
 
     <div class="row">
-        <div class="two columns"></div>
+        <div class="two columns">&nbsp;</div>
         <div class="eight columns">
             <input id="search" class="u-full-width" placeholder="Search" type="email">
         </div>
@@ -29,15 +29,13 @@
         </div>
     </div>
     <div class="row">
-        <div class="five columns">
-
-        </div>
-        <div class="two columns">
-
-        </div>
-        <div class="five columns">
-
-        </div>
+        {% for bucket in data.buckets %}
+            {% for date, docs in bucket.items() %}
+            <span>
+                <b>{{ date }}: </b>{{ docs }}
+            </span>
+            {% endfor %}
+        {% endfor %}
     </div>
 </div>
 
