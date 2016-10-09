@@ -93,3 +93,5 @@ ENV/
 # scrapy json exports
 *.json
 *.zip
+
+app/static/js/Search*
