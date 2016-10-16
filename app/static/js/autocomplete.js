@@ -28,7 +28,19 @@ $(function () {
     });
 
     search = function (start, end) {
-        query = $('#search').val();
+        var query = $('#search').val();
         window.location.href = "http://127.0.0.1:8080/search/" + query + '/' + start + '/' + end + '/';
-    }
+    };
+
+    $("a#article-url").on('click', function () {
+        var articleUrl = $(this).attr('url');
+        var articleTitle = $(this).text();
+        $.redirect('http://127.0.0.1:8080/article/', {'query': articleUrl, 'title': articleTitle});
+    });
+
+    $("a#more-article-url").on('click', function () {
+        var articleUrl = $(this).attr('url');
+        var articleTitle = $(this).find('h5').text();
+        $.redirect('http://127.0.0.1:8080/article/', {'query': articleUrl, 'title': articleTitle});
+    });
 });
