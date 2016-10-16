@@ -5,8 +5,10 @@ class Config(object):
     INDEX_NAME = 'vinf_fin'
     INDEX_TYPE = 'articles'
 
+
 class DevelopmentConfig(Config):
     DEBUG = True
+
 
 class TestingConfig(Config):
     TESTING = True

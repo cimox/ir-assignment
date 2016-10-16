@@ -4,6 +4,8 @@ import arrow
 
 from requests import ConnectionError
 from flask import Flask, render_template, request, jsonify, url_for
+from es_utils import _search, _article, _more_like_this
+from urllib import quote_plus
 
 app = Flask(__name__)
 app.config.from_object('config.DevelopmentConfig')
@@ -44,74 +46,7 @@ def autocomplete(query):
 @app.route('/search/<string:query>/', methods=['POST', 'GET'], defaults={'start': 0, 'size': 10})
 @app.route('/search/<string:query>/<int:start>/<int:size>/', methods=['POST', 'GET'])
 def search(query, start, size):
-    body = {
-        "from": start, "size": size,
-        "query": {
-            "bool": {
-                "must": {
-                    "multi_match": {
-                        "fields": [ "title" ],
-                        "query": query,
-                        "fuzziness": "AUTO"
-                    }
-                },
-                "should": [
-                    {
-                        "range": {
-                            "timestamp": {
-                                "boost": 5,
-                                "gte": "now-90d/d"
-                            }
-                        },
-                        "range": {
-                            "timestamp": {
-                                "boost": 2,
-                                "gte": "now-12m/d"
-                            }
-                        },
-                        "range": {
-                            "timestamp": {
-                                "boost": 1,
-                                "gte": "now-24m/d"
-                            }
-                        }
-                    }
-                ]
-            }
-        },
-        "sort": [
-            {"_score": {"order": "desc"}},
-            {"timestamp": {
-                "order": "desc",
-                "mode": "max"
-            }
-            }
-        ],
-        "highlight": {
-            "fields": {
-                "title": {}
-            }
-        }
-    }
-    r = requests.post('{}/{}/_search'.format(app.config['ES_URL'], app.config['INDEX_NAME']),
-                      data=json.dumps(body))
-    results = []
-    for hit in r.json()['hits']['hits']:
-        results.append({
-            'fields': hit['_source'],
-            'highlight': hit['highlight'],
-            'short_description': u'{}...'.format(hit['_source'].get('article', [])[:180])
-        }
-        )
-
-    data = {
-        'query': query,
-        'query_time': r.json()['took'],
-        'hits_total': r.json()['hits']['total'],
-        'results': results,
-        'start': start,
-        'size': size
-    }
+    data = _search(query, start, size)
     return render_template('search.html', data=data)
 
 
@@ -154,6 +89,19 @@ def search_date(interval, date_from, date_to, size):
     }
 
     return data
+
+
+@app.route('/article/', methods=['POST'])
+def article():
+    article_url = quote_plus(request.form.get('query'))
+    article = _article(article_url)
+    similar = more_like_this(request.form.get('title'))
+    return render_template('article.html', data=article, similar=similar)
+
+
+@app.route('/like/<string:query>/', methods=['GET'])
+def more_like_this(query):
+    return _more_like_this(query)
 
 
 @app.route('/')
