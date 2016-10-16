@@ -5,6 +5,7 @@
     <title>Search | {{ data.query }}</title>
     <script src="{{ url_for('static', filename='js/jquery-3.1.1.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/jquery-ui.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.redirect.js') }}"></script>
     <script src="{{ url_for('static', filename='js/autocomplete.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" type="text/css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/normalize.css') }}" type="text/css">
@@ -41,7 +42,7 @@
                         <img src="{{ result.fields.image_link }}" id="search-thumbnail">
                     </td>
                     <td>
-                        <a href="{{ result.fields.url }}"><b>{{ result.fields.title }}</b></a>
+                        <a href="#" url="{{ result.fields.url }}" id="article-url"><b>{{ result.fields.title }}</b></a>
                         <span>
                             <b>Author: </b>
                             <i>

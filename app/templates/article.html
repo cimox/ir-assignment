@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>IR | {{ data.query }}</title>
+    <script src="{{ url_for('static', filename='js/jquery-3.1.1.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery-ui.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.redirect.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/autocomplete.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" type="text/css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/normalize.css') }}" type="text/css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/skeleton.css') }}" type="text/css">
+</head>
+<body>
+<div class="container">
+    <div class="row" id="search-header">
+        <div class="two columns">
+            <h5>
+                <a href="http://127.0.0.1:8080/" id="search-logo">
+                    IR
+                </a>
+            </h5>
+        </div>
+        <div class="eight columns">
+            <input id="search" class="u-full-width" placeholder="Search" type="email" value="{{ data.results.fields.title }}">
+        </div>
+        <div class="two columns">
+            <input type="button" value="search" onclick="search(0, 10)">
+        </div>
+    </div>
+    <span class="search-hits">
+        Time: <i>{{ data.query_time/1000 }}s</i>
+    </span>
+    <hr>
+    <div class="row">
+        <div class="twelve columns" id="article-content">
+            <h3>{{ data.results.fields.title }}</h3>
+            <span>
+                <b>Author(s): </b>
+                <i>
+                    {% for author in data.results.fields.author %}
+                        {{ author }},
+                    {% endfor %}
+                </i>
+                <b>Categories:</b>
+                <i>
+                    {% for category in data.results.fields.categories %}
+                        {{ category }}
+                    {% endfor %}
+                </i>
+            </span>
+            <p class="article-content">
+                <img src="{{ data.results.fields.image_link }}" class="article-image"/>
+                {{ data.results.fields.article }}
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="twele columns" id="search-pagination">
+            <table class="u-full-width">
+                <tbody><h4>More like this:</h4></tbody>
+                {% for s in similar.results %}
+                    <tr>
+                        <td>
+                            <img src="{{ s.image_link }}" width="200px" />
+                        </td>
+                        <td>
+                            <a href="#" url="{{ s.url }}" id="more-article-url">
+                                <h5>{{ s.title }}</h5>
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+</div>
+
+</div>
+</body>
+</html>
