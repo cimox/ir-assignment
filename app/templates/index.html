@@ -6,6 +6,8 @@
     <script src="{{ url_for('static', filename='js/jquery-3.1.1.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/jquery-ui.js') }}"></script>
     <script src="{{ url_for('static', filename='js/autocomplete.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+    <script src="http://code.highcharts.com/highcharts.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" type="text/css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/normalize.css') }}" type="text/css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/skeleton.css') }}" type="text/css">
@@ -28,14 +30,43 @@
             <input type="button" value="search" onclick="search(0, 10)">
         </div>
     </div>
+    <div class="row">&nbsp;</div> <!-- an empty line -->
     <div class="row">
-        {% for bucket in data.buckets %}
-            {% for date, docs in bucket.items() %}
-            <span>
-                <b>{{ date }}: </b>{{ docs }}
-            </span>
+        <div class="twelve columns">
+            <center><h5>Descriptive stats:</h5></center>
+        </div>
+    </div>
+    <div class="row">
+        <table class="u-full-width">
+            <tr>
+                <td><b>categories count</b></td>
+                <td>{{ data.desc_stats.results.categories_count.value }}</td>
+            </tr>
+            <tr>
+                <td><b>authors count</b></td>
+                <td>{{ data.desc_stats.results.authors_count.value }}</td>
+            </tr>
+            <tr>
+                <td><b>articles count</b></td>
+                <td>{{ data.desc_stats.results.articles_stats.count }}</td>
+            </tr>
+            <tbody>
+            {% for key, value in data.desc_stats.results.articles_stats.items() %}
+            {% if key not in ['count', 'min'] %}
+            <tr>
+                <td><b>{{ key }} article length</b></td>
+                <td>{{ value|round|int }} chars</td>
+            </tr>
+            {% endif %}
             {% endfor %}
-        {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="row">
+        <div id="container" style="width:100%; height:400px;"></div>
+    </div>
+    <div class="row">
+        <div id="container-articles-over-time" style="height: 300px"></div>
     </div>
 </div>
 
