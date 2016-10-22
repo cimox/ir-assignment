@@ -2,7 +2,7 @@ class Config(object):
     DEBUG = False
     TESTING = False
     ES_URL = 'http://localhost:9200/'
-    INDEX_NAME = 'vinf_fin'
+    INDEX_NAME = 'vinf_final'
     INDEX_TYPE = 'articles'
 
 

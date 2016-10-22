@@ -1,4 +1,5 @@
 import requests
+import arrow
 import json
 
 from flask import Flask, render_template, request, jsonify, url_for
@@ -6,6 +7,37 @@ from urllib import unquote_plus
 
 app = Flask(__name__)
 app.config.from_object('config.DevelopmentConfig')
+
+
+def _autocomplete(query):
+    body = {
+        "size": 5,
+        "fields": [
+            "title",
+            "timestamp",
+            "categories"
+        ],
+        "query": {
+            "match": {
+                "title": query
+            }
+        },
+        "sort": [
+            {"_score": {"order": "desc"}},
+            {"timestamp": {
+                "order": "desc",
+                "mode": "max"
+            }
+            }
+        ]
+    }
+    r = requests.post('{}/{}/_search'.format(app.config['ES_URL'], app.config['INDEX_NAME']),
+                      data=json.dumps(body))
+    data = {
+        'autocomplete': [hit['fields']['title'][0] for hit in r.json()['hits']['hits']]
+    }
+    app.logger.debug('Autocomplete request: {} -> response: {}'.format(query, data))
+    return data
 
 
 def _search(query, start, size):
@@ -116,7 +148,7 @@ def _more_like_this(query, size=6):
         "query": {
             "more_like_this": {
                 "fields": [
-                    "title", "article"
+                    "article"
                 ],
                 "like_text": query,
                 "min_term_freq": 1,
@@ -132,7 +164,7 @@ def _more_like_this(query, size=6):
             'title': hit['_source']['title'],
             'url': hit['_source']['url'],
             'image_link': hit['_source']['image_link']
-            }
+        }
         )
     data = {
         'query': query,
@@ -142,3 +174,106 @@ def _more_like_this(query, size=6):
     }
 
     return data
+
+
+def _search_date(interval, date_from, date_to, size):
+    body = {
+        "size": size,
+        "query": {
+            "range": {
+                "timestamp": {
+                    "from": date_from,
+                    "to": date_to
+                }
+            }
+        },
+        "aggregations": {
+            "articles_over_time": {
+                "date_histogram": {
+                    "field": "timestamp",
+                    "interval": interval
+                }
+            }
+        },
+        "sort": [
+            {
+                "timestamp": {
+                    "order": "asc"
+                }
+            }
+        ]
+    }
+    r = requests.post('{}/{}/_search'.format(app.config['ES_URL'], app.config['INDEX_NAME']),
+                      data=json.dumps(body))
+
+    buckets = []
+    for bucket in r.json()['aggregations']['articles_over_time']['buckets']:
+        buckets.append({
+            arrow.get(bucket.get('key_as_string')).format('YYYY-MM-DD'): bucket.get('doc_count')
+        })
+    results = []
+    for hit in r.json()['hits']['hits']:
+        results.append({
+            'fields': hit['_source'],
+            'short_description': u'{}...'.format(hit['_source'].get('article', [])[:180])
+        }
+        )
+    return {
+        'results': results if len(results) > 1 else results[0],
+        'buckets': buckets,
+        'query': date_from,
+        'query_time': r.json()['took']
+    }
+
+
+def _stats():
+    # article stats, authors cardinality and categories cardinality
+    body = {
+        "size": 0,
+        "query": {"match_all": {}},
+        "aggs": {
+            "articles_stats": {
+                "stats": {
+                    "script": "_source.article.toString().length()"
+                }
+            },
+            "authors_count": {
+                "cardinality": {
+                    "field": "author"
+                }
+            },
+            "categories_count": {
+                "cardinality": {
+                    "field": "categories"
+                }
+            }
+        }
+    }
+    r = requests.post('{}/{}/_search'.format(app.config['ES_URL'], app.config['INDEX_NAME']),
+                      data=json.dumps(body))
+
+    return {
+        'results': r.json()['aggregations'],
+        'query_time': r.json()['took']
+    }
+
+
+def _articles_ln_histogram():
+    body = {
+        "size": 0,
+        "aggs": {
+            "articles_ln_histogram": {
+                "histogram": {
+                    "script": "_source.article.toString().length()",
+                    "interval": 250
+                }
+            }
+        }
+    }
+    r = requests.post('{}/{}/_search'.format(app.config['ES_URL'], app.config['INDEX_NAME']),
+                      data=json.dumps(body))
+
+    return {
+        'results': r.json()['aggregations']['articles_ln_histogram'],
+        'query_time': r.json()['took']
+    }
