@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Search | {{ data.query }}</title>
+    <script src="{{ url_for('static', filename='js/jquery-3.1.1.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery-ui.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.redirect.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/autocomplete.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" type="text/css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/normalize.css') }}" type="text/css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/skeleton.css') }}" type="text/css">
+</head>
+<body>
+<div class="container">
+    <div class="row" id="search-header">
+        <div class="two columns">
+            <h5>
+                <a href="http://127.0.0.1:8080/" id="search-logo">
+                    IR
+                </a>
+            </h5>
+        </div>
+        <div class="eight columns">
+            <input id="search" class="u-full-width" placeholder="Search" type="email" value="Date: {{ data.query }}">
+        </div>
+        <div class="two columns">
+            <input type="button" value="search" onclick="search(0, 10)">
+        </div>
+    </div>
+    <span class="search-hits">
+        Took <i>({{ data.query_time/1000 }}s)</i>
+    </span>
+    <hr>
+    <div class="row" id="search-results">
+        <div class="twelve columns">
+            <table class="u-full-width">
+                <tbody>
+                {% for result in data.results %}
+                <tr>
+                    <td>
+                        <img src="{{ result.fields.image_link }}" id="search-thumbnail">
+                    </td>
+                    <td>
+                        <a href="#" url="{{ result.fields.url }}" id="article-url"><b>{{ result.fields.title }}</b></a>
+                        <span>
+                            <b>Author: </b>
+                            <i>
+                                {% for author in result.fields.author %}
+                                    {{ author }},
+                                {% endfor %}
+                            </i>
+                        </span>
+                        <span>
+                            {{ result.short_description }}
+                        </span>
+                    </td>
+                    <td>
+                        <b>Tags:</b>
+                        <div class="tags-wrap">
+                            {% for category in result.fields.categories %}
+                            {{ category }}
+                            {% endfor %}
+                        </div>
+                        <span>
+                            <b>Date: </b>
+                            <a href="http://127.0.0.1:8080/date/day/{{ result.fields.timestamp }}/">
+                                {{ result.fields.timestamp }}
+                            </a>
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+</div>
+</body>
+</html>
