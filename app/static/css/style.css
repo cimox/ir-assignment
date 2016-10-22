@@ -58,3 +58,20 @@ span {
 .tags-wrap {
     max-width: 500px;
 }
+
+#article-content {
+    text-align: center;
+}
+
+.article-content {
+    text-align: justify;
+}
+
+.article-image {
+    float: left;
+    width: 400px;
+    margin-right: 10px;
+    margin-top: 5px;
+    margin-bottom: 2px;
+    border: 1px solid black;
+}
