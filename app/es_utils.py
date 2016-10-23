@@ -79,7 +79,7 @@ def _search(query, start, size):
         "sort": [
             {"_score": {"order": "desc"}},
             {"timestamp": {
-                "order": "desc",
+                "order": "asc",
                 "mode": "max"
             }
             }
