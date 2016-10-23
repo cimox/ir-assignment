@@ -47,7 +47,7 @@ def _search(query, start, size):
             "bool": {
                 "must": {
                     "multi_match": {
-                        "fields": ["title"],
+                        "fields": ["title", "article", "author"],
                         "query": query,
                         "fuzziness": "AUTO"
                     }
@@ -86,7 +86,9 @@ def _search(query, start, size):
         ],
         "highlight": {
             "fields": {
-                "title": {}
+                "title": {},
+                "article": {},
+                "author": {}
             }
         }
     }
@@ -109,6 +111,7 @@ def _search(query, start, size):
         'start': start,
         'size': size
     }
+    app.logger.debug("Search query: {} -> result {}".format(query, json.dumps(data, indent=4, sort_keys=True)))
 
     return data
 
