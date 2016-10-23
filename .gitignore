@@ -95,3 +95,5 @@ ENV/
 *.zip
 
 app/static/js/Search*
+app/static/js/jquery.redirect.js
+xcimermanm_elasticsearch.docx
